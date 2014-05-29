@@ -1,0 +1,53 @@
+doctype 5
+html
+  herd
+    meta charset="utf-8"
+    title #{@title} - Marejew
+    link rel="stylesheet" href="css/bootstrap.min.css"
+  body
+    / JavaScript
+    script type="text/javascript" src="js/jquery-2.1.1.min.js"
+    script type="text/javascript" src="js/bootstrap.min.js"
+    / End
+    .container
+      .row
+        .col-md-3.col-sm-3
+          ul.nav.nav-pills.nav-stacked
+            - if @active == "home"
+                li.active
+                  a href="/" 
+                    span.glyphicon.glyphicon-home ホーム
+                li
+                  a href="/lend" 
+                    span.glyphicon.glyphicon-briefcase 貸出
+                li
+                  a href="/return"
+                    span.glyphicon.glyphicon-book 返却
+
+            - if @active == "lend"
+                li
+                  a href="/"
+                    span.glyphicon.glyphicon-home ホーム
+                li.active
+                  a href="/lend"
+                    span.glyphicon.glyphicon-briefcase 貸出
+                li
+                  a href="/return"
+                    span.glyphicon.glyphicon-book 返却
+
+            - if @active == "return"
+                li
+                  a href="/"
+                    span.glyphicon.glyphicon-home ホーム
+                li
+                  a href="/lend"
+                    span.glyphicon.glyphicon-briefcase 貸出
+                li.active
+                  a href="/return"
+                    span.glyphicon.glyphicon-book 返却
+
+        .col-md-9.col-sm-9
+          == yield
+
+      ol.breadcrumb
+        li &copy; 2014 The Marejew developers
