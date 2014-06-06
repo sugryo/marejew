@@ -23,7 +23,7 @@ end
 class Books < ActiveRecord::Base
 end
 
-class LendBooks < ActiveRecord::Base
+class Lendbooks < ActiveRecord::Base
 end
 
 module Database
@@ -60,7 +60,7 @@ module Database
       end
 
       def have?(number)
-	if Books.find_by_id(number)
+	if Books.find(number)
 	  true
 	else
 	  false
@@ -86,7 +86,8 @@ module Database
       end
 
       def have?(books_number)
-	if Lendbooks.find_by_books_id(books_number)
+	number = books_number.to_i
+	if Lendbooks.find_by_books_id(number)
 	  true
 	else
 	  false
