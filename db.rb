@@ -36,7 +36,7 @@ module Database
       end
 
       def have?(id)
-	if Users.where(id: id)
+	if Users.find(id)
 	  true
 	else
 	  false
@@ -60,7 +60,7 @@ module Database
       end
 
       def have?(number)
-	if Books.find(number)
+	if Books.find_by_id(number)
 	  true
 	else
 	  false
@@ -78,7 +78,7 @@ module Database
     class << self
       def add(users_id, books_number)
         lend_day = Date.today
-        return_Day = lend_day + 7
+        return_day = lend_day + 7
         Lendbooks.create(users_id:  users_id,
 	                books_id:  books_number,
 	                lendday:   lend_day.to_s,
