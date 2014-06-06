@@ -30,7 +30,7 @@ module Database
   class User
     class << self
       def add(name, class_name)
-	Users.create(name:      users_name,
+	Users.create(name:      name,
 	             uclass:    class_name,
 	             booklimit: 0)
       end
