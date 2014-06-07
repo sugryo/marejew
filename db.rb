@@ -35,6 +35,10 @@ module Database
 	             booklimit: 0)
       end
 
+      def show
+	Users.all
+      end
+
       def have?(id)
 	if Users.find(id)
 	  true
@@ -57,6 +61,10 @@ module Database
 	             author:    author,
 	             publisher: publisher,
 	             isbn:      isbn)
+      end
+
+      def show
+	Books.all
       end
 
       def have?(number)
@@ -83,6 +91,10 @@ module Database
 	                books_id:  books_number,
 	                lendday:   lend_day.to_s,
 	                returnday: return_day.to_s)
+      end
+
+      def show
+	Lendbooks.all
       end
 
       def have?(books_number)
