@@ -36,13 +36,18 @@ module Database
       end
 
       def show
-	Users.all
+	puts Users.all
       end
 
       def have?(id)
-	if Users.find(id)
-	  true
-	else
+	begin
+	  int_id = id.to_i
+	  if Users.find(int_id)
+	    true
+	  else
+	    false
+	  end
+	rescue
 	  false
 	end
       end
@@ -64,13 +69,18 @@ module Database
       end
 
       def show
-	Books.all
+	puts Books.all
       end
 
       def have?(number)
-	if Books.find_by_id(number)
-	  true
-	else
+	begin
+	  int_number = number.to_i
+	  if Books.find_by_id(int_number)
+	    true
+	  else
+	    false
+	  end
+	rescue
 	  false
 	end
       end
@@ -94,14 +104,18 @@ module Database
       end
 
       def show
-	Lendbooks.all
+	puts Lendbooks.all
       end
 
       def have?(books_number)
-	number = books_number.to_i
-	if Lendbooks.find_by_books_id(number)
-	  true
-	else
+	begin
+	  number = books_number.to_i
+	  if Lendbooks.find_by_books_id(number)
+	    true
+	  else
+	    false
+	  end
+	rescue
 	  false
 	end
       end
@@ -147,3 +161,5 @@ module Database
     end
   end
 end
+
+Database::User.show
