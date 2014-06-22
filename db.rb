@@ -14,7 +14,7 @@ require 'yaml'
 
 ActiveRecord::Base.establish_connection(
   :adapter => "sqlite3",
-  :database => "./db/marejew.db"
+  :database => "db/marejew.db"
   )
 
 class Users < ActiveRecord::Base
@@ -27,87 +27,120 @@ class Lendbooks < ActiveRecord::Base
 end
 
 module Database
-  class Add
+  class User
     class << self
-      def user(users_name, users_class)
-	Users.create(name: users_name, uclass: users_class, booklimit: 0)
+      def add(name, class_name)
+	Users.create(name:      name,
+	             uclass:    class_name,
+	             booklimit: 0)
       end
 
-      def book(books_title, books_author, books_publisher, isbn)
-	Books.create(title: books_title, author: books_author, publisher: books_publisher, isbn: isbn)
+      def show
+	puts Users.all
       end
 
-      def isbn_book(isbn)
-	rakuten_id = [application_id: "", affiliate_id: ""]
-	RakutenWebService.configuration do |c|
-	  c.application = rakuten_id[:application_id]
-	  c.affiliate_id = rakuten_id[:affiliate_id]
+      def have?(id)
+	begin
+	  int_id = id.to_i
+	  if Users.find(int_id)
+	    true
+	  else
+	    false
+	  end
+	rescue
+	  false
 	end
-	books = RakutenWebService::Books::Book.search(isbn: isbn)
-	books.each do |book|
-	  title = book["title"]
-	  author = book["author"]
-	  publisher_name = book["publisherName"]
-	  isbn = book["isbn"]
-	  Books.create(title: title, author: author, publisher: publisher_name, isbn: isbn)
-	end
       end
 
-      def lend(users_id, books_number)
-	lend_day = Date.today
-	return_day = lend_day + 7
-	
-	lend = Lendbooks.new do |l|
-	  l.users_id = users_id
-	  l.books_id = books_number
-	  l.lendday = lend_day.to_s
-	  l.returnday = return_day.to_s
-	end
-	lend.save
-      end
-
-      def book_limit(users_id)
-	users = Users.find(users_id)
-	book_limit = users[:booklimit]
-	book_limit += 1
-	Users.update(users_id, booklimit: book_limit)
+      def delete(id)
+	users_data = Users.find(id)
+	users_data.destroy
       end
     end
   end
 
-  class Search
+  class Book
     class << self
-      def user?(users_id)
-	if Users.where(id: users_id)
-	  true
-	else
-	  false
-	end
+      def add(title, author, publisher, isbn)
+	Books.create(title:     title,
+	             author:    author,
+	             publisher: publisher,
+	             isbn:      isbn)
       end
 
-      def book?(books_number)
-	if Books.find_by_id(books_number)
-	  true
-	else
-	  false
-	end
+      def show
+	puts Books.all
       end
 
-      def lend?(books_number)
-	if Lendbooks.find_by_books_id(books_number)
-	  true
-	else
-	  false
-	end
-      end
-
-      def book_limit?(users_id)
+      def have?(number)
 	begin
-	  record = Users.find_by_id(users_id)
-	  if record == nil
+	  int_number = number.to_i
+	  if Books.find_by_id(int_number)
+	    true
+	  else
 	    false
 	  end
-	  books_limit = record[:booklimit]
+	rescue
+	  false
+	end
+      end
+
+      def delete(number)
+	book_data = Books.find(number)
+	book_data.destroy
+      end
+    end
+  end
+
+  class LendBook
+    class << self
+      def add(users_id, books_number)
+        lend_day = Date.today
+        return_day = lend_day + 7
+        Lendbooks.create(users_id:  users_id,
+	                books_id:  books_number,
+	                lendday:   lend_day.to_s,
+	                returnday: return_day.to_s)
+      end
+
+      def show
+	puts Lendbooks.all
+      end
+
+      def have?(books_number)
+	begin
+	  number = books_number.to_i
+	  if Lendbooks.find_by_books_id(number)
+	    true
+	  else
+	    false
+	  end
+	rescue
+	  false
+	end
+      end
+
+      def delete(books_number)
+	lendbooks_data = Lendbooks.find(books_number)
+	lendbooks_data.destroy
+	return lendbooks_data[:users_id]
+      end
+    end
+  end
+
+  class BookLimit
+    class << self
+      def add(users_id)
+	users_data = Users.find(users_id)
+	book_limit = users_data[:booklimit]
+	book_limit += 1
+	Users.update(users_id, booklimit: book_limit)
+      end
+
+      def limit?(users_id)
+	begin
+	  users_data = Users.find(users_id)
+	  books_limit = users_data[:booklimit]
 	  books_limit += 1
 	  if books_limit <= 2
 	    true
@@ -118,36 +151,15 @@ module Database
 	  false
 	end
       end
-    end
-  end
 
-  class Delete
-    class << self
-      def user(users_id)
-	user = Users.find(users_id)
-	user.destroy
-      end
-
-      def book(book_number)
-	book = Books.find(book_number)
-	book.destroy
-      end
-
-      def lend(books_number)
-	lend = Lendbooks.find(books_number)
-	lend.destroy
-	return lend[:users_id]
-      end
-
-      def book_limit(users_id)
-	users = Users.find(users_id)
-	book_limit = users[:booklimit]
-	book_limit -= 1
-	Users.update(users_id, booklimit: book_limit)
+      def delete(users_id)
+	users_data = Users.find(users_id)
+	books_limit = users_data[:booklimit]
+	books_limit -= 1
+	Users.update(users_id, booklimit: books_limit)
       end
     end
   end
 end
-p Users.all
-p Books.all
-p Lendbooks.all
+
+Database::User.show

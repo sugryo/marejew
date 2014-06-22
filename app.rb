@@ -38,7 +38,7 @@ module Marejew2
     post "/lend_second" do
       users_id = params[:users_id]
       session[:users_id] = nil
-      if Database::Search.user?(users_id) && Database::Search.book_limit?(users_id)
+      if Database::User.have?(users_id) && Database::BookLimit.limit?(users_id)
 	puts "OK"
 	session[:users_id] = users_id
 	@title = "貸出"
@@ -52,9 +52,9 @@ module Marejew2
     post "/lend_finished" do
       books_number = params[:books_number]
       if session[:users_id]
-        if Database::Search.book?(books_number) && !Database::Search.lend?(books_number)
-          Database::Add.lend(session[:users_id], books_number)
-	  Database::Add.book_limit(session[:users_id])
+        if Database::Book.have?(books_number) && !Database::LendBook.have?(books_number)
+          Database::LendBook.add(session[:users_id], books_number)
+	  Database::BookLimit.add(session[:users_id])
 	  @title = "貸出完了"
 	  @active = "lend"
 	  slim :lend_finished
@@ -68,9 +68,9 @@ module Marejew2
 
     post "/return_finished" do
       books_number = params[:books_number]
-      if Database::Search.lend?(books_number)
-	users_id = Database::Delete.lend(books_number)
-	Database::Delete.book_limit(users_id)
+      if Database::LendBook.have?(books_number)
+	users_id = Database::LendBook.delete(books_number)
+	Database::BookLimit.delete(users_id)
 	@title = "返却完了"
 	@active = "return"
 	slim :return_finished
